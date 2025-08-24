@@ -15,6 +15,8 @@ public partial class Plugin : BaseUnityPlugin
 {
     private readonly Harmony _harmony = new(Id);
 
+    public static Config DMCConfig { get; internal set; }
+
     internal static ManualLogSource Log { get; private set; } = null!;
 
     internal static AssetBundle DMCAssets;
@@ -28,6 +30,8 @@ public partial class Plugin : BaseUnityPlugin
         var dllFolderPath = System.IO.Path.GetDirectoryName(Info.Location);
         var assetBundleFilePath = System.IO.Path.Combine(dllFolderPath, "devilmayclimbassets");
         DMCAssets = AssetBundle.LoadFromFile(assetBundleFilePath);
+
+        DMCConfig = new(base.Config);
 
         DMCAssetManager.Init();
 
