@@ -8,6 +8,7 @@ namespace DevilMayClimb.Service
     public class DMCAssetManager
     {
         public static AudioClip wipeout;
+        public static AudioClip fail;
         public static AudioClip minorTrick_0;
         public static AudioClip trick_0;
         public static AudioClip trick_1;
@@ -80,6 +81,7 @@ namespace DevilMayClimb.Service
             sssTitle = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("SSSTitle")[1]);
 
             wipeout = (AudioClip)Plugin.DMCAssets.LoadAsset("Wipeout");
+            fail = (AudioClip)Plugin.DMCAssets.LoadAsset("Fail");
             minorTrick_0 = (AudioClip)Plugin.DMCAssets.LoadAsset("MinorTrick_0");
             trick_0 = (AudioClip)Plugin.DMCAssets.LoadAsset("Trick_0");
             trick_1 = (AudioClip)Plugin.DMCAssets.LoadAsset("Trick_1");

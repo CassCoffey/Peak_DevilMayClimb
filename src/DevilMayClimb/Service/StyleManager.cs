@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -41,8 +42,22 @@ namespace DevilMayClimb.Service
         private static Color32 SUCCESS_COLOR = new Color32(86, 197, 0, 255);
         private static Color32 FAILURE_COLOR = new Color32(195, 12, 21, 255);
 
+        private static string[] FAIL_LINES = ["Oof", "Ouch", "Owie"];
+
+        private static bool init = false;
+
+        private static void Init()
+        {
+            GlobalEvents.OnItemConsumed = (Action<Item, Character>)Delegate.Combine(GlobalEvents.OnItemConsumed, new Action<Item, Character>(CheckItemEaten));
+            GlobalEvents.OnLuggageOpened = (Action<Luggage, Character>)Delegate.Combine(GlobalEvents.OnLuggageOpened, new Action<Luggage, Character>(CheckLuggageOpened));
+
+            init = true;
+        }
+
         public static void RegisterPlayer(Player localPlayer)
         {
+            if (!init) Init();
+
             LocalPlayer = localPlayer;
 
             Plugin.Log.LogInfo("Registering player");
@@ -105,6 +120,13 @@ namespace DevilMayClimb.Service
             AddTrickHistory(action + "! +" + points, SUCCESS_COLOR);
         }
 
+        public static void ApplyFailure()
+        {
+            StyleAudio.PlayOneShot(DMCAssetManager.fail);
+
+            AddTrickHistory(FAIL_LINES[UnityEngine.Random.Range(0, 4)] + "! -100", FAILURE_COLOR);
+        }
+
         public static void ApplyWipeout(int points)
         {
             StyleAudio.PlayOneShot(DMCAssetManager.wipeout);
@@ -142,6 +164,22 @@ namespace DevilMayClimb.Service
             trick.transform.Find("TrickText").GetComponent<TextMeshProUGUI>().text = text;
             trick.transform.Find("TrickText").GetComponent<TextMeshProUGUI>().color = color;
             trick.AddComponent<TrickFadout>();
+        }
+
+        private static void CheckItemEaten(Item item, Character character)
+        {
+            if (character.IsLocal && StyleTracker.localStyleTracker)
+            {
+                StyleTracker.localStyleTracker.ItemEaten(item);
+            }
+        }
+
+        private static void CheckLuggageOpened(Luggage luggage, Character character)
+        {
+            if (character.IsLocal && StyleTracker.localStyleTracker)
+            {
+                StyleTracker.localStyleTracker.LuggageOpened();
+            }
         }
     }
 }
