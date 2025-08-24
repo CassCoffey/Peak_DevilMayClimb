@@ -55,29 +55,29 @@ namespace DevilMayClimb.Service
             styleUIPrefab = (GameObject)Plugin.DMCAssets.LoadAsset("StyleGroup");
             trickUIPanelPrefab = (GameObject)Plugin.DMCAssets.LoadAsset("TrickUIPrefab");
 
-            dRank = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("DRank"));
-            cRank = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("CRank"));
-            bRank = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("BRank"));
-            aRank = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("ARank"));
-            sRank = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("SRank"));
-            ssRank = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("SSRank"));
-            sssRank = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("SSSRank"));
+            dRank = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("DRank")[1]);
+            cRank = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("CRank")[1]);
+            bRank = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("BRank")[1]);
+            aRank = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("ARank")[1]);
+            sRank = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("SRank")[1]);
+            ssRank = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("SSRank")[1]);
+            sssRank = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("SSSRank")[1]);
 
-            dRankFill = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("DRankFill"));
-            cRankFill = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("CRankFill"));
-            bRankFill = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("BRankFill"));
-            aRankFill = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("ARankFill"));
-            sRankFill = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("SRankFill"));
-            ssRankFill = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("SSRankFill"));
-            sssRankFill = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("SSSRankFill"));
+            dRankFill = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("DRankFill")[1]);
+            cRankFill = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("CRankFill")[1]);
+            bRankFill = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("BRankFill")[1]);
+            aRankFill = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("ARankFill")[1]);
+            sRankFill = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("SRankFill")[1]);
+            ssRankFill = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("SSRankFill")[1]);
+            sssRankFill = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("SSSRankFill")[1]);
 
-            dTitle = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("DTitle"));
-            cTitle = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("CTitle"));
-            bTitle = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("BTitle"));
-            aTitle = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("ATitle"));
-            sTitle = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("STitle"));
-            ssTitle = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("SSTitle"));
-            sssTitle = ConvertToSprite((Texture2D)Plugin.DMCAssets.LoadAsset("SSSTitle"));
+            dTitle = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("DTitle")[1]);
+            cTitle = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("CTitle")[1]);
+            bTitle = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("BTitle")[1]);
+            aTitle = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("ATitle")[1]);
+            sTitle = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("STitle")[1]);
+            ssTitle = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("SSTitle")[1]);
+            sssTitle = (Sprite)(Plugin.DMCAssets.LoadAssetWithSubAssets("SSSTitle")[1]);
 
             wipeout = (AudioClip)Plugin.DMCAssets.LoadAsset("Wipeout");
             minorTrick_0 = (AudioClip)Plugin.DMCAssets.LoadAsset("MinorTrick_0");
@@ -95,7 +95,7 @@ namespace DevilMayClimb.Service
 
         private static Sprite ConvertToSprite(Texture2D tex)
         {
-            return Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            return Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100, 1, SpriteMeshType.Tight);
         }
     }
 }

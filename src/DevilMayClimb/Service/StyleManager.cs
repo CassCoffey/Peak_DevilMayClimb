@@ -29,6 +29,12 @@ namespace DevilMayClimb.Service
         private static Transform TrickHistory;
         private static AudioSource StyleAudio;
 
+        private static Image rankImage;
+        private static Image rankFillImage;
+        private static Image titleImage;
+
+        private static int previousStyleRank = 0;
+
         private static float lastTrickTime;
         private static int trickChain = 0;
 
@@ -60,6 +66,12 @@ namespace DevilMayClimb.Service
             StyleUI = GameObject.Instantiate(DMCAssetManager.styleUIPrefab, GUIManager.instance.hudCanvas.transform);
             TrickHistory = StyleUI.transform.Find("StylePanel/TrickHistory");
             StyleAudio = StyleUI.GetComponent<AudioSource>();
+
+            rankImage = StyleUI.transform.Find("StylePanel/Rank").GetComponent<Image>();
+            rankFillImage = StyleUI.transform.Find("StylePanel/Rank/RankFill").GetComponent<Image>();
+            titleImage = StyleUI.transform.Find("StylePanel/Title").GetComponent<Image>();
+
+            rankFillImage.gameObject.AddComponent<FillBounce>();
         }
 
         public static void ApplyStyleAction(string action, int points, float time)
@@ -92,20 +104,28 @@ namespace DevilMayClimb.Service
 
         public static void UpdateStyleRank(int rank)
         {
-            Image rankImage = StyleUI.transform.Find("StylePanel/Rank").GetComponent<Image>();
-            Image rankFillImage = StyleUI.transform.Find("StylePanel/Rank/RankFill").GetComponent<Image>();
-            Image titleImage = StyleUI.transform.Find("StylePanel/Title").GetComponent<Image>();
-
             rankImage.sprite = DMCAssetManager.ranks[rank];
             rankFillImage.sprite = DMCAssetManager.fills[rank];
             titleImage.sprite = DMCAssetManager.titles[rank];
+
+            if (previousStyleRank < rank) rankFillImage.fillAmount = 0f;
+            if (previousStyleRank > rank) rankFillImage.fillAmount = 1f;
+
+            previousStyleRank = rank;
         }
 
         public static void UpdateStyleFill(float percent)
         {
-            Image rankFillImage = StyleUI.transform.Find("StylePanel/Rank/RankFill").GetComponent<Image>();
+            Plugin.Log.LogInfo("Style Fill percent - " + percent);
 
-            rankFillImage.fillAmount = percent;
+            if (percent - rankFillImage.fillAmount > 0.1f)
+            {
+                rankFillImage.GetComponent<FillBounce>().SetGoal(percent);
+            }
+            else
+            {
+                rankFillImage.fillAmount = percent;
+            }
         }
 
         private static void AddTrickHistory(string text)
