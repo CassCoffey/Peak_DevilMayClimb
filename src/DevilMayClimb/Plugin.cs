@@ -1,8 +1,10 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using DevilMayClimb.Patch;
+using DevilMayClimb.Service;
 using HarmonyLib;
 using System.Reflection;
+using UnityEngine;
 
 namespace DevilMayClimb;
 
@@ -15,11 +17,19 @@ public partial class Plugin : BaseUnityPlugin
 
     internal static ManualLogSource Log { get; private set; } = null!;
 
+    internal static AssetBundle DMCAssets;
+
     private void Awake()
     {
         Log = Logger;
 
         Log.LogInfo($"Loading {Name} Version {Version}");
+
+        var dllFolderPath = System.IO.Path.GetDirectoryName(Info.Location);
+        var assetBundleFilePath = System.IO.Path.Combine(dllFolderPath, "devilmayclimbassets");
+        DMCAssets = AssetBundle.LoadFromFile(assetBundleFilePath);
+
+        DMCAssetManager.Init();
 
         Log.LogInfo($"Applying patches...");
         ApplyPluginPatch();

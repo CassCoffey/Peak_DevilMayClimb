@@ -12,10 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="GameObject\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Bundle\devilmayclimbassets">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
