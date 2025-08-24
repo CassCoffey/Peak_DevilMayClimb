@@ -38,6 +38,9 @@ namespace DevilMayClimb.Service
         private static float lastTrickTime;
         private static int trickChain = 0;
 
+        private static Color32 SUCCESS_COLOR = new Color32(86, 197, 0, 255);
+        private static Color32 FAILURE_COLOR = new Color32(195, 12, 21, 255);
+
         public static void RegisterPlayer(Player localPlayer)
         {
             LocalPlayer = localPlayer;
@@ -99,7 +102,14 @@ namespace DevilMayClimb.Service
                 }
             }
 
-            AddTrickHistory(action + "! +" + points);
+            AddTrickHistory(action + "! +" + points, SUCCESS_COLOR);
+        }
+
+        public static void ApplyWipeout(int points)
+        {
+            StyleAudio.PlayOneShot(DMCAssetManager.wipeout);
+
+            AddTrickHistory("Wipeout! -" + points, FAILURE_COLOR);
         }
 
         public static void UpdateStyleRank(int rank)
@@ -116,9 +126,7 @@ namespace DevilMayClimb.Service
 
         public static void UpdateStyleFill(float percent)
         {
-            Plugin.Log.LogInfo("Style Fill percent - " + percent);
-
-            if (percent - rankFillImage.fillAmount > 0.1f)
+            if (percent != rankFillImage.fillAmount && percent - rankFillImage.fillAmount > 0.1f)
             {
                 rankFillImage.GetComponent<FillBounce>().SetGoal(percent);
             }
@@ -128,10 +136,11 @@ namespace DevilMayClimb.Service
             }
         }
 
-        private static void AddTrickHistory(string text)
+        private static void AddTrickHistory(string text, Color32 color)
         {
             GameObject trick = GameObject.Instantiate(DMCAssetManager.trickUIPanelPrefab, TrickHistory);
             trick.transform.Find("TrickText").GetComponent<TextMeshProUGUI>().text = text;
+            trick.transform.Find("TrickText").GetComponent<TextMeshProUGUI>().color = color;
             trick.AddComponent<TrickFadout>();
         }
     }

@@ -35,8 +35,6 @@ namespace DevilMayClimb.Monobehavior
 
         public void SetGoal(float newGoal)
         {
-            if (newGoal == goalFill) return;
-
             goalFill = newGoal;
             fillStart = Time.time;
             currentFill = image.fillAmount;
