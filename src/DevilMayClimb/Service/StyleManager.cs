@@ -45,10 +45,15 @@ namespace DevilMayClimb.Service
 
         private static bool init = false;
 
+        private static Item lastThrownItem;
+        private static Vector3 lastThrownItemPos;
+
         private static void Init()
         {
             GlobalEvents.OnItemConsumed = (Action<Item, Character>)Delegate.Combine(GlobalEvents.OnItemConsumed, new Action<Item, Character>(CheckItemEaten));
             GlobalEvents.OnLuggageOpened = (Action<Luggage, Character>)Delegate.Combine(GlobalEvents.OnLuggageOpened, new Action<Luggage, Character>(CheckLuggageOpened));
+            GlobalEvents.OnItemThrown = (Action<Item>)Delegate.Combine(GlobalEvents.OnItemThrown, new Action<Item>(CheckItemThrown));
+            GlobalEvents.OnItemRequested = (Action<Item, Character>)Delegate.Combine(GlobalEvents.OnItemRequested, new Action<Item, Character>(CheckItemCaught));
 
             init = true;
         }
@@ -176,18 +181,29 @@ namespace DevilMayClimb.Service
 
         private static void CheckItemEaten(Item item, Character character)
         {
-            if (character.IsLocal && StyleTracker.localStyleTracker)
-            {
-                StyleTracker.localStyleTracker.ItemEaten(item);
-            }
+            if (!character.IsLocal || !StyleTracker.localStyleTracker) return;
+            
+            StyleTracker.localStyleTracker.ItemEaten(item);
         }
 
         private static void CheckLuggageOpened(Luggage luggage, Character character)
         {
-            if (character.IsLocal && StyleTracker.localStyleTracker)
-            {
-                StyleTracker.localStyleTracker.LuggageOpened(luggage);
-            }
+            if (!character.IsLocal || !StyleTracker.localStyleTracker) return;
+            
+            StyleTracker.localStyleTracker.LuggageOpened(luggage);
+        }
+
+        private static void CheckItemThrown(Item item)
+        {
+            lastThrownItem = item;
+            lastThrownItemPos = item.transform.position;
+        }
+
+        private static void CheckItemCaught(Item item, Character character)
+        {
+            if (!StyleTracker.localStyleTracker || lastThrownItem != item) return;
+
+            StyleTracker.localStyleTracker.ItemCaught(item, character, lastThrownItemPos);
         }
     }
 }

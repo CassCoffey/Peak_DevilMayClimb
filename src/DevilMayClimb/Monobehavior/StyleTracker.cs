@@ -450,6 +450,46 @@ namespace DevilMayClimb.Monobehavior
             SendStyleAction("Friend Boost", 30);
         }
 
+        public void ItemCaught(Item item, Character character, Vector3 thrownPos)
+        {
+            // Item must be thrown for at least a half second
+            if (Time.time - item.lastThrownTime >= 0.5f)
+            {
+                // If the item is moving
+                if (item.GetComponent<Rigidbody>() && item.GetComponent<Rigidbody>().linearVelocity.sqrMagnitude > (3f * 3f))
+                {
+                    float throwDistSqr = (item.transform.position - thrownPos).sqrMagnitude;
+                    float longThrowDistSqr = 10f * 10f;
+
+                    // We were the thrower
+                    if (item.lastThrownCharacter == localCharacter)
+                    {
+                        if (throwDistSqr >= longThrowDistSqr) 
+                        {
+                            SendStyleAction("Long Pass", 40);
+                        } 
+                        else
+                        {
+                            SendStyleAction("Pass", 25);
+                        }
+                    }
+
+                    // We were the catcher
+                    if (character == localCharacter)
+                    {
+                        if (throwDistSqr >= longThrowDistSqr)
+                        {
+                            SendStyleAction("Long Catch", 40);
+                        }
+                        else
+                        {
+                            SendStyleAction("Catch", 25);
+                        }
+                    }
+                }
+            }
+        }
+
         private void UpdateStyle()
         {
             if (stylePoints > MAX_STYLE) stylePoints = MAX_STYLE;
