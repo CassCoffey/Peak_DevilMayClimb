@@ -7,7 +7,7 @@ namespace DevilMayClimb.Monobehavior
 {
     public class TrickFadout : MonoBehaviour
     {
-        public float lifeTime = 4f;
+        public float lifeTime = 5f;
         public float fadoutTime = 1f;
 
         public void Update()

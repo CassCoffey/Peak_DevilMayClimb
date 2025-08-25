@@ -196,7 +196,7 @@ namespace DevilMayClimb.Monobehavior
                     if (wallSliding)
                     {
                         wallSliding = false;
-                        if (Time.time - wallSlideStart >= 0.3f) SendStyleAction("Slide", 40);
+                        if (Time.time - wallSlideStart >= 0.4f) SendStyleAction("Slide", 40);
                         SetClimbStart();
                     } 
                     else

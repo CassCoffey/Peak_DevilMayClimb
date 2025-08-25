@@ -50,7 +50,7 @@ namespace DevilMayClimb.Patch
             // Only care about the local character
             if (!__instance.character.IsLocal || !StyleTracker.localStyleTracker) return;
 
-            if (__instance.FallTime() <= __instance.fallDamageTime && __instance.FallTime() > __instance.fallDamageTime - 0.5f)
+            if (__instance.FallTime() <= __instance.fallDamageTime && __instance.FallTime() > __instance.fallDamageTime - 0.4f)
             {
                 StyleTracker.localStyleTracker.CloseFall();
             }
@@ -102,11 +102,12 @@ namespace DevilMayClimb.Patch
         {
             if (!StyleTracker.localStyleTracker) return;
 
-            Plugin.Log.LogInfo("Cooked - " + __instance.timesCookedLocal);
-
-            if (__instance.timesCookedLocal == 1)
+            if (__instance.item.holderCharacter && __instance.item.holderCharacter == Character.localCharacter)
             {
-                StyleTracker.localStyleTracker.Cooked();
+                if (__instance.timesCookedLocal == 1)
+                {
+                    StyleTracker.localStyleTracker.Cooked();
+                }
             }
         }
     }

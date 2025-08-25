@@ -143,6 +143,9 @@ namespace DevilMayClimb.Service
             if (previousStyleRank < rank) rankFillImage.fillAmount = 0f;
             if (previousStyleRank > rank) rankFillImage.fillAmount = 1f;
 
+            rankImage.GetComponent<Animator>().Play("RankAnimation");
+            titleImage.GetComponent<Animator>().Play("TitleAnimation");
+
             previousStyleRank = rank;
         }
 
