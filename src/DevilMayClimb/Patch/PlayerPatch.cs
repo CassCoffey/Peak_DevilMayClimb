@@ -144,5 +144,59 @@ namespace DevilMayClimb.Patch
 
             StyleTracker.localStyleTracker.RemovedThorn();
         }
+
+        [HarmonyPatch(typeof(Scorpion), "InflictAttack")]
+        [HarmonyPostfix]
+        public static void ScorpionAttack(ref Scorpion __instance, Character character)
+        {
+            if (!StyleTracker.localStyleTracker || character != Character.localCharacter) return;
+
+            StyleTracker.localStyleTracker.ScorpionSting();
+        }
+
+        [HarmonyPatch(typeof(SlipperyJellyfish), "Trigger")]
+        [HarmonyPostfix]
+        public static void JellyfishSlip(ref SlipperyJellyfish __instance, int targetID)
+        {
+            if (!StyleTracker.localStyleTracker) return;
+
+            Character component = PhotonView.Find(targetID).GetComponent<Character>();
+            if (component == null || component != Character.localCharacter)
+            {
+                return;
+            }
+
+            StyleTracker.localStyleTracker.JellyfishSlip();
+        }
+
+        [HarmonyPatch(typeof(TumbleWeed), "OnCollisionEnter")]
+        [HarmonyPostfix]
+        public static void TumbleWeedCollide(ref TumbleWeed __instance, Collision collision)
+        {
+            //Don't like this, will need to redo to avoid rewriting full tumbleweed collision function
+            if (!StyleTracker.localStyleTracker) return;
+
+            Character componentInParent = collision.gameObject.GetComponentInParent<Character>();
+            if (!componentInParent || !componentInParent.IsLocal) return;
+            if (__instance.ignored.Contains(componentInParent)) return;
+
+            float num = __instance.transform.localScale.x / __instance.originalScale;
+            if (__instance.originalScale == 0f)
+            {
+                num = 1f;
+            }
+            num = Mathf.Clamp01(num);
+            float num2 = Mathf.Clamp01(__instance.rig.linearVelocity.magnitude * num * __instance.powerMultiplier);
+            if (__instance.testFullPower)
+            {
+                num2 = 1f;
+            }
+            if (num2 < 0.2f)
+            {
+                return;
+            }
+
+            StyleTracker.localStyleTracker.Tumbleweed();
+        }
     }
 }

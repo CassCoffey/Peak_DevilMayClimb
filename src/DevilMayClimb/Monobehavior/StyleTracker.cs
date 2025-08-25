@@ -105,6 +105,9 @@ namespace DevilMayClimb.Monobehavior
             if (localCharacter.refs.afflictions.GetCurrentStatus(CharacterAfflictions.STATUSTYPE.Injury) >= .3f) mods.Add(new StyleMod("Busted", .25f));
             if (localCharacter.refs.afflictions.GetCurrentStatus(CharacterAfflictions.STATUSTYPE.Curse) >= .3f) mods.Add(new StyleMod("Wicked", .5f));
 
+            // Weather
+            if (localCharacter.data.slippy > 0f) mods.Add(new StyleMod("Slippery", .25f));
+
             return mods;
         }
 
@@ -448,6 +451,21 @@ namespace DevilMayClimb.Monobehavior
         public void FriendBooster()
         {
             SendStyleAction("Friend Boost", 30);
+        }
+
+        public void ScorpionSting()
+        {
+            SendStyleAction("Stinger", -50);
+        }
+
+        public void JellyfishSlip()
+        {
+            SendStyleAction("Slip", -25);
+        }
+
+        public void Tumbleweed()
+        {
+            SendStyleAction("Tumbled", -25);
         }
 
         public void ItemCaught(Item item, Character character, Vector3 thrownPos)
