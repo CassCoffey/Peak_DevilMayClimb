@@ -60,10 +60,9 @@ namespace DevilMayClimb.Patch
         [HarmonyPostfix]
         public static void GUIGrasp(ref GUIManager __instance)
         {
-            if (StyleTracker.localStyleTracker)
-            {
-                StyleTracker.localStyleTracker.Grasp();
-            }
+            if (!StyleTracker.localStyleTracker) return;
+
+            StyleTracker.localStyleTracker.Grasp();
         }
 
         [HarmonyPatch(typeof(CharacterMovement), "CheckForPalJump")]
@@ -104,10 +103,7 @@ namespace DevilMayClimb.Patch
 
             if (__instance.item.holderCharacter && __instance.item.holderCharacter == Character.localCharacter)
             {
-                if (__instance.timesCookedLocal == 1)
-                {
-                    StyleTracker.localStyleTracker.Cooked();
-                }
+                StyleTracker.localStyleTracker.Cooked(__instance.timesCookedLocal);
             }
         }
     }

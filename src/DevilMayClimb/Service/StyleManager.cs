@@ -84,6 +84,7 @@ namespace DevilMayClimb.Service
             StyleUI = GameObject.Instantiate(DMCAssetManager.styleUIPrefab, GUIManager.instance.hudCanvas.transform);
             TrickHistory = StyleUI.transform.Find("StylePanel/TrickHistory");
             StyleAudio = StyleUI.GetComponent<AudioSource>();
+            StyleAudio.volume = Config.styleVolume.Value;
 
             rankImage = StyleUI.transform.Find("StylePanel/Rank").GetComponent<Image>();
             rankFillImage = StyleUI.transform.Find("StylePanel/Rank/RankFill").GetComponent<Image>();
@@ -95,7 +96,11 @@ namespace DevilMayClimb.Service
         public static void ApplyStyleAction(string action, int points, float time)
         {
             // Handle trick
-            if (points < 50)
+            if (points < 0)
+            {
+                StyleAudio.PlayOneShot(DMCAssetManager.fail);
+            }
+            else if (points < 50)
             {
                 StyleAudio.PlayOneShot(DMCAssetManager.minorTrick_0);
             } 
@@ -117,14 +122,21 @@ namespace DevilMayClimb.Service
                 }
             }
 
-            AddTrickHistory(action + "! +" + points, SUCCESS_COLOR);
+            if (points < 0)
+            {
+                AddTrickHistory(action + "! " + points, FAILURE_COLOR);
+            } 
+            else
+            {
+                AddTrickHistory(action + "! +" + points, SUCCESS_COLOR);
+            }
         }
 
         public static void ApplyFailure()
         {
             StyleAudio.PlayOneShot(DMCAssetManager.fail);
 
-            AddTrickHistory(FAIL_LINES[UnityEngine.Random.Range(0, 4)] + "! -100", FAILURE_COLOR);
+            AddTrickHistory(FAIL_LINES[UnityEngine.Random.Range(0, 3)] + "! -100", FAILURE_COLOR);
         }
 
         public static void ApplyWipeout(int points)

@@ -8,6 +8,7 @@ namespace DevilMayClimb
     public class Config
     {
         public static ConfigEntry<float> styleVolume;
+        public static ConfigEntry<float> decayMult;
 
         public Config(ConfigFile cfg)
         {
@@ -17,6 +18,13 @@ namespace DevilMayClimb
                     "styleVolume",
                     0.5f,
                     "The volume of the Style audio (0-1)."
+            );
+
+            decayMult = cfg.Bind(
+                    "General",
+                    "decayMult",
+                    1f,
+                    "The multplier for Style Decay. Higher numbers = Faster decay."
             );
         }
     }

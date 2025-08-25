@@ -31,6 +31,10 @@ target = "/"
 source = "../../LICENSE"
 target = "/"
 
+[[build.copy]]
+source = "../../src/DevilMayClimb/Bundle/devilmayclimbassets"
+target = "plugins/"
+
 # The following config options only apply when using TCLI to publish to Thunderstore directly:
 
 [publish]

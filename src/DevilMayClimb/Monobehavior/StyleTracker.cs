@@ -17,8 +17,8 @@ namespace DevilMayClimb.Monobehavior
         public const float RANK_POINTS = 100f;
         public const float MAX_STYLE = RANK_POINTS * 7f;
 
-        private const float SLOW_DECAY = 0.02f;
-        private const float FAST_DECAY = 0.04f;
+        private const float SLOW_DECAY = 0.025f;
+        private const float FAST_DECAY = 0.05f;
         private const float TRICK_GRACE = 5f;
 
         // Squared to avoid using sqrt
@@ -43,6 +43,8 @@ namespace DevilMayClimb.Monobehavior
         private bool vineGrinding = false;
 
         private bool cannonLaunched = false;
+
+        private float lastGrasp = 0f;
 
         private bool passedOut = false;
         private float passedOutTime = 0f;
@@ -348,7 +350,11 @@ namespace DevilMayClimb.Monobehavior
 
         public void Grasp()
         {
-            SendStyleAction("Helping Hand", 20);
+            if (Time.time - lastGrasp >= 2.5f)
+            {
+                SendStyleAction("Helping Hand", 20);
+                lastGrasp = Time.time;
+            }
         }
 
         public void Campfire()
@@ -356,9 +362,20 @@ namespace DevilMayClimb.Monobehavior
             SendStyleAction("Campfire", 50);
         }
 
-        public void Cooked()
+        public void Cooked(int timesCooked)
         {
-            SendStyleAction("Chef", 10);
+            if (timesCooked == 1)
+            {
+                SendStyleAction("Chef", 10);
+            }
+            if (timesCooked == 2)
+            {
+                SendStyleAction("Overcooked", 5);
+            }
+            if (timesCooked >= 3)
+            {
+                SendStyleAction("Fire Hazard", -10);
+            }
         }
 
         public void FriendBoosted()
@@ -385,6 +402,8 @@ namespace DevilMayClimb.Monobehavior
 
                 // Decay faster at S ranks
                 if (styleRank > 3) decay *= 2f;
+
+                decay *= Config.decayMult.Value;
 
                 stylePoints -= decay;
             }
