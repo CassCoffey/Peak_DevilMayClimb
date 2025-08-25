@@ -21,8 +21,9 @@ Being injured or worse, _boring_, will lose you points and ranks.
 
 ## Future Work
 * Bugfixing
+* Balancing point values
 * Graze bonus tricks, for narrowly avoiding hazards
-* Catching tricks, for catching thrown items
+* Improving catching tricks, for catching thrown items
 * Other tricks probably
 * Perhaps a tangible reward for being stylish?
 * End run readout of your overall style
@@ -32,6 +33,7 @@ Being injured or worse, _boring_, will lose you points and ranks.
 [Hardcore Parkour by chrispavs](https://thunderstore.io/c/peak/p/chrispavs/HardcoreParkour/)
 
 ## Credits
+- Soap and Myliaa: Testing help
 - Devil May Cry: Style Meter Inspiration
 - Tony Hawk's Pro Skater: Trick SFX
 - SSX On Tour: Other SFX, obtained from [this amazing archive](https://gist.github.com/SlyCooperReloadCoded/b89a1e4ae346c75ffba0e92b608b9f01)
