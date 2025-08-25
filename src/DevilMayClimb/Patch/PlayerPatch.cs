@@ -1,9 +1,11 @@
 ﻿using DevilMayClimb.Monobehavior;
 using DevilMayClimb.Service;
 using HarmonyLib;
+using Photon.Pun;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 using static CharacterAfflictions;
 
 namespace DevilMayClimb.Patch
@@ -105,6 +107,42 @@ namespace DevilMayClimb.Patch
             {
                 StyleTracker.localStyleTracker.Cooked(__instance.timesCookedLocal);
             }
+        }
+
+        [HarmonyPatch(typeof(RespawnChest), "SpawnItems")]
+        [HarmonyPrefix]
+        public static void RespawnChestSpawnItems(ref RespawnChest __instance, List<Transform> spawnSpots)
+        {
+            if (!StyleTracker.localStyleTracker) return;
+
+            StyleTracker.localStyleTracker.RespawnChestActivated();
+        }
+
+        [HarmonyPatch(typeof(ScoutEffigy), "FinishConstruction")]
+        [HarmonyPrefix]
+        public static void EffigyFinish(ref ScoutEffigy __instance)
+        {
+            if (!StyleTracker.localStyleTracker || __instance.item.holderCharacter != Character.localCharacter) return;
+
+            StyleTracker.localStyleTracker.EffigyActivated();
+        }
+
+        [HarmonyPatch(typeof(Character), "FeedItem")]
+        [HarmonyPrefix]
+        public static void CharacterFeed(ref Character __instance, Item item)
+        {
+            if (!StyleTracker.localStyleTracker || __instance != Character.localCharacter) return;
+
+            StyleTracker.localStyleTracker.FedItem(item);
+        }
+
+        [HarmonyPatch(typeof(ThornOnMe), "Interact_CastFinished")]
+        [HarmonyPostfix]
+        public static void ThornInteract(ref ThornOnMe __instance, Character interactor)
+        {
+            if (!StyleTracker.localStyleTracker || interactor != Character.localCharacter) return;
+
+            StyleTracker.localStyleTracker.RemovedThorn();
         }
     }
 }

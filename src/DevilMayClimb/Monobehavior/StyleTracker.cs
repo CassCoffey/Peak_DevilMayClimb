@@ -7,6 +7,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI.Extensions.Tweens;
+using static Zorro.ControllerSupport.Rumble.RumbleClip;
 
 namespace DevilMayClimb.Monobehavior
 {
@@ -14,18 +15,21 @@ namespace DevilMayClimb.Monobehavior
     {
         public static StyleTracker localStyleTracker;
 
-        public const float RANK_POINTS = 100f;
-        public const float MAX_STYLE = RANK_POINTS * 7f;
+        public static float RANK_POINTS = (100f * Config.rankMult.Value);
+        public static float MAX_STYLE = RANK_POINTS * 7f;
 
         private const float SLOW_DECAY = 0.025f;
         private const float FAST_DECAY = 0.05f;
         private const float TRICK_GRACE = 5f;
+        private const float INTERNAL_TRICK_COOLDOWN = 0.1f;
 
         // Squared to avoid using sqrt
         private const float MIN_CLIMB = 2f * 2f;
         private const float LONG_CLIMB = 10f * 10f;
 
         private Character? localCharacter;
+
+        private Dictionary<string, float> trickRecordDict;
 
         private float stylePoints = 0f;
         private int styleRank = 0;
@@ -52,6 +56,8 @@ namespace DevilMayClimb.Monobehavior
 
         public void Awake()
         {
+            trickRecordDict = new Dictionary<string, float>();
+
             localStyleTracker = this;
 
             localCharacter = GetComponent<Character>();
@@ -89,7 +95,7 @@ namespace DevilMayClimb.Monobehavior
             }
 
             // Status Mods
-            if (localCharacter.refs.afflictions.GetCurrentStatus(CharacterAfflictions.STATUSTYPE.Hunger) >= .3f) mods.Add(new StyleMod("Gluttonous", .25f));
+            if (localCharacter.refs.afflictions.GetCurrentStatus(CharacterAfflictions.STATUSTYPE.Hunger) >= .3f) mods.Add(new StyleMod("Ravenous", .25f));
             if (localCharacter.refs.afflictions.GetCurrentStatus(CharacterAfflictions.STATUSTYPE.Weight) >= .3f) mods.Add(new StyleMod("Loaded", .25f));
             if (localCharacter.refs.afflictions.GetCurrentStatus(CharacterAfflictions.STATUSTYPE.Hot) >= .3f) mods.Add(new StyleMod("Blazing", .25f));
             if (localCharacter.refs.afflictions.GetCurrentStatus(CharacterAfflictions.STATUSTYPE.Cold) >= .3f) mods.Add(new StyleMod("Chill", .25f));
@@ -105,6 +111,9 @@ namespace DevilMayClimb.Monobehavior
         private void SendStyleAction(string action, int points)
         {
             if (localCharacter.data.passedOut || localCharacter.data.fullyPassedOut || localCharacter.data.dead) return;
+
+            // Cannot repeat a trick too quickly
+            if (trickRecordDict.TryGetValue(action, out float prevTime) && Time.time - prevTime < INTERNAL_TRICK_COOLDOWN) return;
 
             int totalPoints = points;
             float totalModifier = 1.0f;
@@ -123,12 +132,17 @@ namespace DevilMayClimb.Monobehavior
                 totalModifier += 0.25f;
             }
 
-            totalPoints = Mathf.RoundToInt((float)points * totalModifier);
+            // Don't modify negative points or pause style decay
+            if (points > 0)
+            {
+                totalPoints = Mathf.RoundToInt((float)points * totalModifier);
+                lastTrickTime = Time.time;
+            }
 
             stylePoints += totalPoints;
             StyleManager.ApplyStyleAction(fullTrickName, totalPoints, Time.time);
 
-            lastTrickTime = Time.time;
+            trickRecordDict[action] = Time.time;
         }
 
         public void FixedUpdate()
@@ -170,9 +184,9 @@ namespace DevilMayClimb.Monobehavior
                 // Quick Revival!
                 if (Time.time - passedOutTime < 5f)
                 {
-                    stylePoints = passedOutPoints + 100f;
+                    stylePoints = passedOutPoints + (100f * Config.rankMult.Value);
 
-                    StyleManager.ApplyStyleAction("Close Call", Mathf.RoundToInt(passedOutPoints + 100f), Time.time);
+                    StyleManager.ApplyStyleAction("Close Call", Mathf.RoundToInt(passedOutPoints + (100f * Config.rankMult.Value)), Time.time);
                 }
 
                 passedOut = false;
@@ -309,9 +323,35 @@ namespace DevilMayClimb.Monobehavior
             }
         }
 
-        public void LuggageOpened()
+        public void FedItem(Item item)
         {
-            SendStyleAction("Plunder", 10);
+            if (item.GetComponent<Action_RestoreHunger>() || item.GetComponent<Action_GiveExtraStamina>())
+            {
+                SendStyleAction("Waiter", 15);
+            }
+            else if (item.GetComponent<Action_ModifyStatus>())
+            {
+                Action_ModifyStatus status = item.GetComponent<Action_ModifyStatus>();
+                if (status.changeAmount < 0f && (status.statusType == CharacterAfflictions.STATUSTYPE.Poison || status.statusType == CharacterAfflictions.STATUSTYPE.Injury))
+                {
+                    SendStyleAction("Medic", 25);
+                }
+            }
+        }
+
+        public void LuggageOpened(Luggage luggage)
+        {
+            // Respawn chest is a special case
+            if (luggage is RespawnChest) return;
+
+            if (luggage is LuggageCursed)
+            {
+                SendStyleAction("Risky Plunder", Mathf.RoundToInt(100f * Config.rankMult.Value));
+            }
+            else
+            {
+                SendStyleAction("Plunder", 10);
+            }
         }
 
         private void SetClimbStart()
@@ -339,7 +379,7 @@ namespace DevilMayClimb.Monobehavior
 
         public void Fail()
         {
-            stylePoints -= 100f;
+            stylePoints -= (100f * Config.rankMult.Value);
             StyleManager.ApplyFailure();
         }
 
@@ -362,6 +402,11 @@ namespace DevilMayClimb.Monobehavior
             SendStyleAction("Campfire", 50);
         }
 
+        public void RemovedThorn()
+        {
+            SendStyleAction("Medic", 10);
+        }
+
         public void Cooked(int timesCooked)
         {
             if (timesCooked == 1)
@@ -376,6 +421,23 @@ namespace DevilMayClimb.Monobehavior
             {
                 SendStyleAction("Fire Hazard", -10);
             }
+        }
+
+        public void RespawnChestActivated()
+        {
+            if (Ascents.canReviveDead && Character.PlayerIsDeadOrDown())
+            {
+                SendStyleAction("Rule 0", 50);
+            }
+            else
+            {
+                SendStyleAction("Perfect Ascent", 70);
+            }
+        }
+
+        public void EffigyActivated()
+        {
+            SendStyleAction("Rule 0", 50);
         }
 
         public void FriendBoosted()
@@ -411,7 +473,7 @@ namespace DevilMayClimb.Monobehavior
             if (stylePoints < 0) stylePoints = 0;
 
             // We need to update the style ranking
-            int newRank = Mathf.FloorToInt(stylePoints / 100f);
+            int newRank = Mathf.FloorToInt(stylePoints / (100f * Config.rankMult.Value));
             if (newRank < 0) newRank = 0;
             if (newRank > 6) newRank = 6;
             if (newRank != styleRank)
@@ -420,7 +482,7 @@ namespace DevilMayClimb.Monobehavior
                 styleRank = newRank;
             }
 
-            StyleManager.UpdateStyleFill((stylePoints / 100f) - (float)styleRank);
+            StyleManager.UpdateStyleFill((stylePoints / (100f * Config.rankMult.Value)) - (float)styleRank);
         }
     }
 }

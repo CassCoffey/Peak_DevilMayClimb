@@ -23,7 +23,6 @@ namespace DevilMayClimb.Service
 
     public static class StyleManager
     {
-        private static Player? LocalPlayer;
         private static Character? LocalCharacter;
 
         private static GameObject StyleUI;
@@ -58,10 +57,6 @@ namespace DevilMayClimb.Service
         {
             if (!init) Init();
 
-            LocalPlayer = localPlayer;
-
-            Plugin.Log.LogInfo("Registering player");
-
             AttachHUD();
         }
 
@@ -75,8 +70,6 @@ namespace DevilMayClimb.Service
 
             LocalCharacter = localCharacter;
             LocalCharacter.gameObject.AddComponent<StyleTracker>();
-
-            Plugin.Log.LogInfo("Registering char");
         }
 
         public static void AttachHUD()
@@ -136,7 +129,7 @@ namespace DevilMayClimb.Service
         {
             StyleAudio.PlayOneShot(DMCAssetManager.fail);
 
-            AddTrickHistory(FAIL_LINES[UnityEngine.Random.Range(0, 3)] + "! -100", FAILURE_COLOR);
+            AddTrickHistory(FAIL_LINES[UnityEngine.Random.Range(0, 3)] + "! -" + (100f * Config.rankMult.Value), FAILURE_COLOR);
         }
 
         public static void ApplyWipeout(int points)
@@ -193,7 +186,7 @@ namespace DevilMayClimb.Service
         {
             if (character.IsLocal && StyleTracker.localStyleTracker)
             {
-                StyleTracker.localStyleTracker.LuggageOpened();
+                StyleTracker.localStyleTracker.LuggageOpened(luggage);
             }
         }
     }
