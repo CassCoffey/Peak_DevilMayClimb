@@ -198,5 +198,18 @@ namespace DevilMayClimb.Patch
 
             StyleTracker.localStyleTracker.Tumbleweed();
         }
+
+        [HarmonyPatch(typeof(Bonkable), "Bonk")]
+        [HarmonyPrefix]
+        public static void BonkableBonk(ref Bonkable __instance, Collision coll)
+        {
+            if (!StyleTracker.localStyleTracker) return;
+
+            Character componentInParent = coll.gameObject.GetComponentInParent<Character>();
+            if (componentInParent && Time.time > __instance.lastBonkedTime + __instance.bonkCooldown)
+            {
+                StyleTracker.localStyleTracker.Bonk(__instance.item, componentInParent);
+            }
+        }
     }
 }

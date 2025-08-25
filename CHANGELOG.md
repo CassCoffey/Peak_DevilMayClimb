@@ -9,10 +9,12 @@
 	* Removing thorns
 	* Opening Cursed Luggage
 	* Passing and Catching thrown items
+	* Bonking someone with an item
 * Added penalties for:
 	* Slipping on a jellyfish
 	* Getting stung by a scorpion
 	* Getting hit by a tumbleweed
+	* Getting bonked by an item
 * Added modifiers for:
 	* Being in the rain
 * Added a new config for Style Rank Multiplier, to change how many points are needed for each rank. Increase to make it take longer to rank up.

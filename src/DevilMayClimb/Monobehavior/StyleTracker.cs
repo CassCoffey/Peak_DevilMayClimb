@@ -468,6 +468,18 @@ namespace DevilMayClimb.Monobehavior
             SendStyleAction("Tumbled", -25);
         }
 
+        public void Bonk(Item item, Character character)
+        {
+            if (item.lastThrownCharacter && item.lastThrownCharacter == localCharacter)
+            {
+                SendStyleAction("Bonk", 25);
+            }
+            if (character == localCharacter)
+            {
+                SendStyleAction("Bonked", -25);
+            }
+        }
+
         public void ItemCaught(Item item, Character character, Vector3 thrownPos)
         {
             // Item must be thrown for at least a half second
