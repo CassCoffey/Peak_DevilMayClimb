@@ -199,7 +199,7 @@ namespace DevilMayClimb.Service
             lastThrownItemPos = item.transform.position;
         }
 
-        private static void CheckItemCaught(Item item, Character character)
+        public static void CheckItemCaught(Item item, Character character)
         {
             if (!StyleTracker.localStyleTracker || lastThrownItem != item) return;
 

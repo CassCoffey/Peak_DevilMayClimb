@@ -8,7 +8,7 @@
 	* Reviving friends
 	* Removing thorns
 	* Opening Cursed Luggage
-	* Passing and Catching thrown items
+	* Catching thrown items
 	* Bonking someone with an item
 * Added penalties for:
 	* Slipping on a jellyfish

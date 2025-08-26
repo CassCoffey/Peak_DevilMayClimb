@@ -199,16 +199,20 @@ namespace DevilMayClimb.Patch
             StyleTracker.localStyleTracker.Tumbleweed();
         }
 
-        [HarmonyPatch(typeof(Bonkable), "Bonk")]
+        [HarmonyPatch(typeof(Bonkable), "OnCollisionEnter")]
         [HarmonyPrefix]
-        public static void BonkableBonk(ref Bonkable __instance, Collision coll)
+        public static void BonkableCollide(ref Bonkable __instance, Collision coll)
         {
+            // I also don't really like this, need to rework with networking possibly?
             if (!StyleTracker.localStyleTracker) return;
 
-            Character componentInParent = coll.gameObject.GetComponentInParent<Character>();
-            if (componentInParent && Time.time > __instance.lastBonkedTime + __instance.bonkCooldown)
+            if (__instance.item.itemState == ItemState.Ground && __instance.item.rig && coll.relativeVelocity.magnitude > __instance.minBonkVelocity)
             {
-                StyleTracker.localStyleTracker.Bonk(__instance.item, componentInParent);
+                Character componentInParent = coll.gameObject.GetComponentInParent<Character>();
+                if (componentInParent && Time.time > __instance.lastBonkedTime + __instance.bonkCooldown)
+                {
+                    StyleTracker.localStyleTracker.Bonk(__instance.item, componentInParent);
+                }
             }
         }
     }

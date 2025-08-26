@@ -382,6 +382,8 @@ namespace DevilMayClimb.Monobehavior
 
         public void Fail()
         {
+            if (localCharacter.refs.afflictions.HasAfflictionType(Affliction.AfflictionType.BingBongShield, out _)) return;
+
             stylePoints -= (100f * Config.rankMult.Value);
             StyleManager.ApplyFailure();
         }
@@ -492,17 +494,18 @@ namespace DevilMayClimb.Monobehavior
                     float longThrowDistSqr = 10f * 10f;
 
                     // We were the thrower
-                    if (item.lastThrownCharacter == localCharacter)
-                    {
-                        if (throwDistSqr >= longThrowDistSqr) 
-                        {
-                            SendStyleAction("Long Pass", 40);
-                        } 
-                        else
-                        {
-                            SendStyleAction("Pass", 25);
-                        }
-                    }
+                    // Can't evaluate this without networking
+                    //if (item.lastThrownCharacter == localCharacter)
+                    //{
+                    //    if (throwDistSqr >= longThrowDistSqr) 
+                    //    {
+                    //        SendStyleAction("Long Pass", 40);
+                    //    } 
+                    //    else
+                    //    {
+                    //        SendStyleAction("Pass", 25);
+                    //    }
+                    //}
 
                     // We were the catcher
                     if (character == localCharacter)
