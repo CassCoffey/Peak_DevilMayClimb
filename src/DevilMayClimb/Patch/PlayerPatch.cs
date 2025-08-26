@@ -131,7 +131,7 @@ namespace DevilMayClimb.Patch
         [HarmonyPrefix]
         public static void CharacterFeed(ref Character __instance, Item item)
         {
-            if (!StyleTracker.localStyleTracker || __instance != Character.localCharacter) return;
+            if (!StyleTracker.localStyleTracker || item.holderCharacter != Character.localCharacter) return;
 
             StyleTracker.localStyleTracker.FedItem(item);
         }
