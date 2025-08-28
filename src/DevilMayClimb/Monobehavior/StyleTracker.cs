@@ -37,8 +37,13 @@ namespace DevilMayClimb.Monobehavior
         private float lastTrickTime = 0f;
         private float lastUpsidedown = 0f;
 
+        private int comboCounter = 1;
+
         private Vector3 climbStartPos = Vector3.zero;
         private Vector3 climbLastPos = Vector3.zero;
+        private Vector3 climbLastNormal = Vector3.zero;
+
+        private bool canTransfer = false;
 
         private bool wallSliding = false;
         private float wallSlideStart = 0f;
@@ -49,6 +54,8 @@ namespace DevilMayClimb.Monobehavior
         private bool cannonLaunched = false;
 
         private float lastGrasp = 0f;
+
+        private float lavaHeatCounter = 0f;
 
         private bool passedOut = false;
         private float passedOutTime = 0f;
@@ -128,16 +135,29 @@ namespace DevilMayClimb.Monobehavior
                 fullTrickName = mod.Descriptor + " " + fullTrickName;
             }
 
-            // Special case for combo
-            if (Time.time - lastTrickTime <= 5f)
-            {
-                fullTrickName += " Combo";
-                totalModifier += 0.25f;
-            }
-
             // Don't modify negative points or pause style decay
             if (points > 0)
             {
+                // Special case for combo
+                if (Time.time - lastTrickTime <= 5f)
+                {
+                    if (Config.comboScaling.Value)
+                    {
+                        comboCounter++;
+                        fullTrickName += " X" + comboCounter + " Combo";
+                        totalModifier += 0.1f * (float)comboCounter;
+                    }
+                    else
+                    {
+                        fullTrickName += " Combo";
+                        totalModifier += 0.25f;
+                    }
+                }
+                else if (comboCounter != 1)
+                {
+                    comboCounter = 1;
+                }
+
                 totalPoints = Mathf.RoundToInt((float)points * totalModifier);
                 lastTrickTime = Time.time;
             }
@@ -198,6 +218,11 @@ namespace DevilMayClimb.Monobehavior
 
         private void CheckClimbing()
         {
+            if (localCharacter.data.isGrounded && canTransfer)
+            {
+                canTransfer = false;
+            }
+
             // Wall
             if (localCharacter.data.isClimbing && !localCharacter.IsSliding())
             {
@@ -217,7 +242,7 @@ namespace DevilMayClimb.Monobehavior
                         wallSliding = false;
                         if (Time.time - wallSlideStart >= 0.4f) SendStyleAction("Slide", 40);
                         SetClimbStart();
-                    } 
+                    }
                     else
                     {
                         EvalClimbDistance(1f);
@@ -361,6 +386,22 @@ namespace DevilMayClimb.Monobehavior
         {
             climbStartPos = localCharacter.TorsoPos();
             climbLastPos = climbStartPos;
+
+            if (localCharacter.data.isClimbing)
+            {
+                if (canTransfer && Vector3.Angle(localCharacter.data.climbNormal, climbLastNormal) >= 80f)
+                {
+                    canTransfer = false;
+                    SendStyleAction("Wall Transfer", 25);
+                }
+
+                canTransfer = true;
+                climbLastNormal = localCharacter.data.climbNormal;
+            }
+            else if (canTransfer)
+            {
+                canTransfer = false;
+            }
         }
 
         private void EvalClimbDistance(float distMultSq)
@@ -377,6 +418,11 @@ namespace DevilMayClimb.Monobehavior
                 }
 
                 climbLastPos = localCharacter.TorsoPos();
+
+                if (localCharacter.data.isClimbing)
+                {
+                    climbLastNormal = localCharacter.data.climbNormal;
+                }
             }
         }
 
@@ -470,6 +516,17 @@ namespace DevilMayClimb.Monobehavior
             SendStyleAction("Tumbled", -25);
         }
 
+        public void LavaHeat(float heatAmount)
+        {
+            lavaHeatCounter += heatAmount;
+
+            if (lavaHeatCounter > 0.12f)
+            {
+                lavaHeatCounter = 0f;
+                SendStyleAction("Hot Feet", 25);
+            }
+        }
+
         public void Bonk(Item item, Character character)
         {
             if (item.lastThrownCharacter && item.lastThrownCharacter == localCharacter)
@@ -536,7 +593,9 @@ namespace DevilMayClimb.Monobehavior
                 if (localCharacter.data.isSprinting || localCharacter.data.isJumping || !localCharacter.data.isGrounded) decay = SLOW_DECAY;
 
                 // Decay faster at S ranks
-                if (styleRank > 3) decay *= 2f;
+                if (styleRank == 4) decay *= 2f;
+                if (styleRank == 5) decay *= 2.5f;
+                if (styleRank == 6) decay *= 3f;
 
                 decay *= Config.decayMult.Value;
 

@@ -215,5 +215,27 @@ namespace DevilMayClimb.Patch
                 }
             }
         }
+
+        [HarmonyPatch(typeof(Lava), "Heat")]
+        [HarmonyPrefix]
+        public static void LavaHeat(ref Lava __instance)
+        {
+            // Redo later with transpiler, likely
+            if (!StyleTracker.localStyleTracker) return;
+
+            Character localCharacter = Character.localCharacter;
+            if (localCharacter == null) return;
+
+            float tempCounter = __instance.counter + Time.deltaTime;
+
+            if (__instance.OutsideBounds(localCharacter.Center)) return;
+
+            float heightDif = localCharacter.Center.y - __instance.transform.position.y;
+            float closeness = 1f - Mathf.Clamp01(heightDif / __instance.height);
+            if (closeness < 0.25f) return;
+            if (tempCounter < __instance.heatRate) return;
+
+            StyleTracker.localStyleTracker.LavaHeat((closeness * 2f) * __instance.heat * 1.5f);
+        }
     }
 }

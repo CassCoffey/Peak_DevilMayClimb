@@ -10,6 +10,7 @@ namespace DevilMayClimb
         public static ConfigEntry<float> styleVolume;
         public static ConfigEntry<float> decayMult;
         public static ConfigEntry<float> rankMult;
+        public static ConfigEntry<bool> comboScaling;
 
         public Config(ConfigFile cfg)
         {
@@ -33,6 +34,13 @@ namespace DevilMayClimb
                     "rankMult",
                     1f,
                     "The multplier for Style Rank size. Higher numbers means more points needed to hit the next Style Rank. 1 = 100pts to rank up."
+            );
+
+            comboScaling = cfg.Bind(
+                    "General",
+                    "comboScaling",
+                    true,
+                    "Enable combo scaling, so longer combos are worth more bonuses."
             );
         }
     }

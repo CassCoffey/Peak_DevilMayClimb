@@ -1,5 +1,13 @@
 # Changelog
 
+### [0.3.0]
+
+* Added tricks for:
+	* Transfering between climbing two surfaces with at least 80 degrees difference
+	* Being dangerously close to lava
+* Added combo scaling (and a config to disable it)
+* Your style now decays faster the higher your S rank
+
 ### [0.2.0]
 
 * Added tricks for:
