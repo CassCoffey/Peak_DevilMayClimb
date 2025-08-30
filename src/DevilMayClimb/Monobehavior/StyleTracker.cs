@@ -38,6 +38,7 @@ namespace DevilMayClimb.Monobehavior
         private float lastUpsidedown = 0f;
 
         private int comboCounter = 1;
+        private bool activeCombo = false;
 
         private Vector3 climbStartPos = Vector3.zero;
         private Vector3 climbLastPos = Vector3.zero;
@@ -144,14 +145,16 @@ namespace DevilMayClimb.Monobehavior
                     if (Config.comboScaling.Value)
                     {
                         comboCounter++;
-                        fullTrickName += " X" + comboCounter + " Combo";
+                        //fullTrickName += " X" + comboCounter + " Combo";
                         totalModifier += 0.1f * (float)comboCounter;
                     }
                     else
                     {
-                        fullTrickName += " Combo";
+                        //fullTrickName += " Combo";
                         totalModifier += 0.25f;
                     }
+
+                    activeCombo = true;
                 }
                 else if (comboCounter != 1)
                 {
@@ -161,9 +164,13 @@ namespace DevilMayClimb.Monobehavior
                 totalPoints = Mathf.RoundToInt((float)points * totalModifier);
                 lastTrickTime = Time.time;
             }
+            else
+            {
+                DropCombo();
+            }
 
             stylePoints += totalPoints;
-            StyleManager.ApplyStyleAction(fullTrickName, totalPoints, Time.time);
+            StyleManager.ApplyStyleAction(fullTrickName, totalPoints, Time.time, comboCounter);
 
             trickRecordDict[action] = Time.time;
         }
@@ -200,6 +207,7 @@ namespace DevilMayClimb.Monobehavior
                 StyleManager.ApplyWipeout(Mathf.RoundToInt(stylePoints));
                 passedOutPoints = stylePoints;
                 stylePoints = 0;
+                DropCombo();
                 passedOut = true;
             }
             else if ((localCharacter.refs.afflictions.statusSum < 1f && !localCharacter.data.passedOut) && passedOut)
@@ -209,7 +217,7 @@ namespace DevilMayClimb.Monobehavior
                 {
                     stylePoints = passedOutPoints + (100f * Config.rankMult.Value);
 
-                    StyleManager.ApplyStyleAction("Close Call", Mathf.RoundToInt(passedOutPoints + (100f * Config.rankMult.Value)), Time.time);
+                    StyleManager.ApplyStyleAction("Close Call", Mathf.RoundToInt(passedOutPoints + (100f * Config.rankMult.Value)), Time.time, 1);
                 }
 
                 passedOut = false;
@@ -432,6 +440,7 @@ namespace DevilMayClimb.Monobehavior
 
             stylePoints -= (100f * Config.rankMult.Value);
             StyleManager.ApplyFailure();
+            DropCombo();
         }
 
         public void CloseFall()
@@ -580,6 +589,16 @@ namespace DevilMayClimb.Monobehavior
             }
         }
 
+        private void DropCombo()
+        {
+            if (!activeCombo) return;
+
+            activeCombo = false;
+            comboCounter = 1;
+            lastTrickTime = 0f;
+            StyleManager.DropCombo();
+        }
+
         private void UpdateStyle()
         {
             if (stylePoints > MAX_STYLE) stylePoints = MAX_STYLE;
@@ -600,6 +619,8 @@ namespace DevilMayClimb.Monobehavior
                 decay *= Config.decayMult.Value;
 
                 stylePoints -= decay;
+
+                DropCombo();
             }
 
             if (stylePoints < 0) stylePoints = 0;

@@ -1,5 +1,10 @@
 # Changelog
 
+### [0.4.0]
+* Added a new combo counter UI element
+	* Trick names no longer include combo information, to cut down on bloat
+* Combo is now broken if you lose any points
+
 ### [0.3.0]
 
 * Added tricks for:

@@ -33,6 +33,12 @@ namespace DevilMayClimb.Service
         private static Image rankFillImage;
         private static Image titleImage;
 
+        private static Transform ComboPanel;
+        private static TextMeshProUGUI ComboNumber;
+        private static TextMeshProUGUI ComboPoints;
+
+        private static int comboCounterTotalPoints = 0;
+
         private static int previousStyleRank = 0;
 
         private static float lastTrickTime;
@@ -89,9 +95,13 @@ namespace DevilMayClimb.Service
             titleImage = StyleUI.transform.Find("StylePanel/Title").GetComponent<Image>();
 
             rankFillImage.gameObject.AddComponent<FillBounce>();
+
+            ComboPanel = StyleUI.transform.Find("StylePanel/ComboPanel");
+            ComboNumber = ComboPanel.Find("ComboNumber").GetComponent<TextMeshProUGUI>();
+            ComboPoints = ComboPanel.Find("ComboPoints").GetComponent<TextMeshProUGUI>();
         }
 
-        public static void ApplyStyleAction(string action, int points, float time)
+        public static void ApplyStyleAction(string action, int points, float time, int comboCount)
         {
             // Handle trick
             if (points < 0)
@@ -128,6 +138,8 @@ namespace DevilMayClimb.Service
             {
                 AddTrickHistory(action + "! +" + points, SUCCESS_COLOR);
             }
+
+            UpdateComboCounter(points, comboCount);
         }
 
         public static void ApplyFailure()
@@ -142,6 +154,25 @@ namespace DevilMayClimb.Service
             StyleAudio.PlayOneShot(DMCAssetManager.wipeout);
 
             AddTrickHistory("Wipeout! -" + points, FAILURE_COLOR);
+        }
+
+        public static void UpdateComboCounter(int points, int comboCount)
+        {
+            if (comboCount == 2)
+            {
+                ComboPanel.GetComponent<Animator>().Play("ComboAppear");
+            }
+
+            ComboNumber.text = comboCount.ToString();
+            comboCounterTotalPoints += points;
+            ComboPoints.text = comboCounterTotalPoints + " pts";
+        }
+
+        public static void DropCombo()
+        {
+            ComboPanel.GetComponent<Animator>().Play("ComboDisappear");
+
+            comboCounterTotalPoints = 0;
         }
 
         public static void UpdateStyleRank(int rank)
